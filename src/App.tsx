@@ -188,15 +188,21 @@ export default function App() {
   }, [source, city, catchment, failAgent, peak]);
 
   function here() {
+    if (!navigator.geolocation) {
+      setError("This browser has no geolocation. Search a city instead.");
+      return;
+    }
+    setError(null);
+    setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         void (async () => {
           const name = await reversePlace(pos.coords.latitude, pos.coords.longitude).catch(
-            () => "This place",
+            () => "Your location",
           );
           await openCity(
             {
-              id: "here",
+              id: `here-${pos.coords.latitude.toFixed(3)}-${pos.coords.longitude.toFixed(3)}`,
               name,
               country: "",
               countryCode: "",
@@ -207,7 +213,17 @@ export default function App() {
           );
         })();
       },
-      () => setError("Location permission denied. Pick a city, or allow location."),
+      (err) => {
+        setLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setError("Location permission denied. Allow it in the browser, or search a city.");
+        } else if (err.code === err.TIMEOUT) {
+          setError("Location timed out. Try again, or search a city.");
+        } else {
+          setError("Could not read location. Search a city instead.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 },
     );
   }
 
@@ -401,6 +417,13 @@ export default function App() {
             We need a place so Open-Meteo can fetch rain and elevation, OpenStreetMap can draw the
             streets, and the solver can run on that box. Pick one, then the console opens.
           </p>
+          <button type="button" className="btn btn-primary" onClick={here} disabled={loading}>
+            {loading ? "Finding you" : "Use my location"}
+          </button>
+          <p className="why">
+            Uses the browser geolocation API (HTTPS). Then Open-Meteo reverse geocoding names the
+            place, and the same rain and terrain APIs run as for a typed city.
+          </p>
           <form
             className="city-search"
             onSubmit={(e) => {
@@ -440,11 +463,8 @@ export default function App() {
                 {c.name}
               </button>
             ))}
-            <button type="button" className="chip dark" onClick={here}>
-              Use my location
-            </button>
           </div>
-          <p className="why">Search uses the Open-Meteo geocoding API. Location uses the browser geolocation API, then Nominatim to name the place.</p>
+          <p className="why">City search uses the Open-Meteo geocoding API.</p>
           {error ? <p className="err">{error}</p> : null}
         </main>
       ) : page === "how" ? (
@@ -546,6 +566,7 @@ export default function App() {
                   onRefuse={(a) => act(a, "no")}
                   tLabel={tLabel()}
                   onChangeCity={() => setPage("pick")}
+                  onUseLocation={here}
                 />
               </>
             ) : null}

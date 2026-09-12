@@ -1,5 +1,7 @@
 # Neeru
 
+![Neeru home](docs/screenshot.png)
+
 Live:
 
 - https://neeru-sigma.vercel.app/
@@ -55,7 +57,7 @@ Hackathon required list. Only items we actually wired are marked **used**. The r
 |---|---|
 | Open-Meteo | Geocoding, elevation DEM sample, live rain, temperature, humidity, 24h/48h forecast |
 | OpenStreetMap + Leaflet | Real map tiles |
-| Nominatim | Reverse-geocode “you are near X” |
+| Browser geolocation + Open-Meteo reverse | “Use my location” on the city picker and console |
 | OSM Overpass | Tunnels and drains when the API answers in time |
 | OSRM | Driving route and distance, then skip flooded points |
 | Supabase | Optional call log (`call_log` table) |

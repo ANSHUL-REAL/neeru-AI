@@ -43,6 +43,7 @@ type Props = {
   onRefuse: (a: ProposedAction) => void;
   tLabel: string;
   onChangeCity: () => void;
+  onUseLocation: () => void;
 };
 
 export function ConsoleBoard({
@@ -64,6 +65,7 @@ export function ConsoleBoard({
   onRefuse,
   tLabel,
   onChangeCity,
+  onUseLocation,
 }: Props) {
   const center = origin ?? { lat: city.lat, lng: city.lng, name: city.name };
   const peakNow = result.rainfall.mmPerHr;
@@ -98,6 +100,9 @@ export function ConsoleBoard({
           </label>
           <button type="button" className="btn btn-secondary" onClick={onChangeCity}>
             Change city
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={onUseLocation}>
+            Use my location
           </button>
           <button type="button" className="btn btn-primary" onClick={onRunStorm}>
             Run storm

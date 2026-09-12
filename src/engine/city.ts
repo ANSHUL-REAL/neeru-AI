@@ -76,24 +76,14 @@ export function parseGeocoding(json: {
 }
 
 export async function reversePlace(lat: number, lng: number): Promise<string> {
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-  const res = await fetch(url, {
-    headers: { Accept: "application/json", "User-Agent": "NeeruFloodDesk/1.0" },
-  });
-  if (!res.ok) return "This place";
+  const url = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lng}&language=en&format=json`;
+  const res = await fetch(url);
+  if (!res.ok) return "Your location";
   const json = (await res.json()) as {
-    name?: string;
-    address?: { suburb?: string; neighbourhood?: string; city?: string; town?: string; village?: string };
+    results?: Array<{ name?: string; admin1?: string; country?: string }>;
   };
-  return (
-    json.name ||
-    json.address?.neighbourhood ||
-    json.address?.suburb ||
-    json.address?.city ||
-    json.address?.town ||
-    json.address?.village ||
-    "This place"
-  );
+  const r = json.results?.[0];
+  return r?.name || r?.admin1 || "Your location";
 }
 
 export async function searchCities(query: string): Promise<City[]> {
