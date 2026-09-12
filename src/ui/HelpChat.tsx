@@ -15,9 +15,10 @@ type Props = {
   you: string;
   result: ForecastResult;
   lastTrip: string | null;
+  research?: { title: string; url: string }[];
 };
 
-export function HelpChat({ cityName, you, result, lastTrip }: Props) {
+export function HelpChat({ cityName, you, result, lastTrip, research = [] }: Props) {
   const [msgs, setMsgs] = useState<ChatMsg[]>([
     {
       role: "assistant",
@@ -34,7 +35,7 @@ export function HelpChat({ cityName, you, result, lastTrip }: Props) {
     const next = [...msgs, { role: "user" as const, text: q }];
     setMsgs(next);
     setBusy(true);
-    const ctx = buildChatContext(cityName, you, result, lastTrip);
+    const ctx = buildChatContext(cityName, you, result, lastTrip, research);
     const flooded = result.points.filter((p) => p.onsetStep !== null);
     const clear = result.points.filter((p) => p.onsetStep === null);
     const spoken = await askHelp(q, next, ctx);

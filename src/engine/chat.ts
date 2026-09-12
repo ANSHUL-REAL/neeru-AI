@@ -12,6 +12,7 @@ export function chatContext(input: {
   flooded: { name: string; depthCm: number; minutes: number | null }[];
   clear: { name: string; depthCm: number }[];
   lastTrip: string | null;
+  research?: { title: string; url: string }[];
 }): string {
   return JSON.stringify(input);
 }
@@ -43,7 +44,7 @@ export async function askHelp(
       {
         role: "system",
         content:
-          "You are Neeru, a flood help desk. Answer in 2-4 short sentences. Tell the person what to do and where to go next using only the named places in the JSON context. Never say a place is safe. Never invent streets. If they ask what to do, give one action. If they ask where to go, name a clear place from the list. No markdown. No em dash.",
+          "You are Neeru, a flood help desk. Answer in 2-4 short sentences. Tell the person what to do and where to go next using the named places in the JSON context. Research hits are live web pages from Exa, labelled reported. Never say a place is safe. Never invent streets. If they ask what to do, give one action. If they ask where to go, name a clear place from the list. No markdown. No em dash.",
       },
       { role: "user", content: `Context: ${ctx}` },
       ...history.slice(-6).map((m) => ({ role: m.role, content: m.text })),
@@ -67,6 +68,7 @@ export function buildChatContext(
   you: string,
   result: ForecastResult,
   lastTrip: string | null,
+  research: { title: string; url: string }[] = [],
 ): string {
   const flooded = result.points
     .filter((p) => p.onsetStep !== null)
@@ -86,6 +88,7 @@ export function buildChatContext(
     flooded,
     clear,
     lastTrip,
+    research,
   });
 }
 

@@ -26,6 +26,47 @@ function openRouterKey(req: IncomingMessage): string {
 function briefPlugin(): Plugin {
   const handle = async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
     const url = req.url?.split("?")[0];
+    if (url === "/api/research") {
+      if (req.method !== "POST") {
+        next();
+        return;
+      }
+      const exa = process.env.EXA_API_KEY || process.env.VITE_EXA_API_KEY || "";
+      if (!exa) {
+        res.statusCode = 501;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ error: "EXA_API_KEY missing", results: [] }));
+        return;
+      }
+      try {
+        const raw = await readBody(req);
+        const body = raw ? JSON.parse(raw) : {};
+        const query = String(body.query ?? "");
+        const upstream = await fetch("https://api.exa.ai/search", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": exa,
+            Authorization: `Bearer ${exa}`,
+          },
+          body: JSON.stringify({
+            query,
+            type: "auto",
+            numResults: 6,
+            contents: { highlights: true },
+          }),
+        });
+        const json = await upstream.json();
+        res.statusCode = upstream.ok ? 200 : upstream.status;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(json));
+      } catch (err) {
+        res.statusCode = 502;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : "exa failed", results: [] }));
+      }
+      return;
+    }
     if (url !== "/api/openrouter" && url !== "/api/brief") {
       next();
       return;

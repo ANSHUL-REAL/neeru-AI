@@ -17,6 +17,7 @@ import {
   type City,
 } from "./engine/city.ts";
 import { runForecast } from "./engine/forecast.ts";
+import { fetchCityResearch, type ResearchHit } from "./engine/research.ts";
 import { planTrip, type LatLng, type TripPlan } from "./engine/route.ts";
 import type { ForecastResult, RainSourceId } from "./types.ts";
 import { Hero } from "./ui/Hero.tsx";
@@ -85,6 +86,7 @@ export default function App() {
   const [page, setPage] = useState<"home" | "console" | "how" | "fleet" | "data" | "help" | "pick">("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [callLog, setCallLog] = useState<LogRow[]>([]);
+  const [research, setResearch] = useState<ResearchHit[]>([]);
 
   useEffect(() => {
     setCallLog(loadLog());
@@ -151,6 +153,7 @@ export default function App() {
       appendLog("city", next.name, `Opened catchment at ${next.lat.toFixed(3)}, ${next.lng.toFixed(3)}`);
       setCallLog(loadLog());
       setPage("console");
+      void fetchCityResearch(next.name).then(setResearch).catch(() => setResearch([]));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load this place");
     } finally {
@@ -567,6 +570,7 @@ export default function App() {
                   tLabel={tLabel()}
                   onChangeCity={() => setPage("pick")}
                   onUseLocation={here}
+                  research={research}
                 />
               </>
             ) : null}

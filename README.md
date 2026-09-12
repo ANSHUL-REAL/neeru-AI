@@ -32,7 +32,7 @@ npm run dev
 
 ## Stack
 
-**AI Tinkerers** · **OpenRouter** · **OpenAI** (`gpt-4o-mini` through OpenRouter)
+**AI Tinkerers** · **OpenRouter** · **OpenAI** (`gpt-4o-mini` through OpenRouter) · **Exa** (city flood research)
 
 Open-Meteo (geocoding, reverse geocoding, elevation, live rain, temperature, humidity) · browser geolocation · OpenStreetMap + Leaflet · OSM Overpass · OSRM · Supabase · Vite · React · TypeScript · Vercel · GitHub Pages
 
@@ -44,4 +44,5 @@ Open-Meteo (geocoding, reverse geocoding, elevation, live rain, temperature, hum
 | Depth, onset, agents | Local solver and agent graph |
 | Go from A to B | OSRM around activated points |
 | Help chat | OpenRouter → OpenAI, grounded in this map |
+| Research | Exa search for flood reports in this city |
 | Call log | Browser, and Supabase when configured |

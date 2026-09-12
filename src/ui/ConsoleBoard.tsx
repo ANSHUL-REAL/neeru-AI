@@ -12,6 +12,7 @@ import { HelpChat } from "./HelpChat.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { City } from "../engine/city.ts";
 import type { LatLng, TripPlan } from "../engine/route.ts";
+import type { ResearchHit } from "../engine/research.ts";
 
 function localMm(peak: number, center: LatLng, p: LatLng): number {
   const d = haversineM(center, p) / 1000;
@@ -44,6 +45,7 @@ type Props = {
   tLabel: string;
   onChangeCity: () => void;
   onUseLocation: () => void;
+  research: ResearchHit[];
 };
 
 export function ConsoleBoard({
@@ -66,6 +68,7 @@ export function ConsoleBoard({
   tLabel,
   onChangeCity,
   onUseLocation,
+  research,
 }: Props) {
   const center = origin ?? { lat: city.lat, lng: city.lng, name: city.name };
   const peakNow = result.rainfall.mmPerHr;
@@ -245,8 +248,30 @@ export function ConsoleBoard({
           you={origin?.name ?? city.name}
           result={result}
           lastTrip={trip ? `${trip.from.name} to ${trip.to.name}` : null}
+          research={research}
         />
       </div>
+
+      <section className="research">
+        <h2>Research · Exa</h2>
+        <p className="muted">
+          Live web search for flood reports in this city. Reported pages, not the solver.
+        </p>
+        {research.length === 0 ? (
+          <p className="muted">No Exa hits yet. Add EXA_API_KEY, or wait for the search to return.</p>
+        ) : (
+          <ul>
+            {research.map((h) => (
+              <li key={h.url}>
+                <a href={h.url} target="_blank" rel="noreferrer">
+                  {h.title}
+                </a>
+                {h.snippet ? <p>{h.snippet}</p> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="alert-out">
         <h2>Alert agent output</h2>
