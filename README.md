@@ -1,6 +1,10 @@
 # Neeru
 
-Live site (after Pages deploys): https://neeru-sigma.vercel.app/
+Live:
+
+- https://neeru-sigma.vercel.app/
+- https://anshul-real.github.io/neeru-AI/
+- Repo: https://github.com/ANSHUL-REAL/neeru-AI
 
 A flood desk for any city. Search a place, run a storm, see which roads pond, ask where to go next.
 
@@ -22,45 +26,53 @@ npm run dev
 
 Open http://127.0.0.1:5173/
 
-Optional: copy `.env.example` to `.env` and add `OPENROUTER_API_KEY` for live Help answers. Without it, Help still answers from the map using a local fallback.
+Copy `.env.example` to `.env` for optional keys:
 
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` store the call log if you ran `supabase/schema.sql`.
-
-## What is live
-
-- OpenStreetMap tiles
-- Open-Meteo geocoding, elevation, forecast
-- OSM Overpass tunnels/drains when the API answers
-- OpenRouter for Help copy when a key is present
+- `OPENROUTER_API_KEY` — Help chat and trip warnings via OpenRouter (`openai/gpt-4o-mini`). Without it, Help still answers from the map using a local fallback.
+- `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` — persist the call log. Run `supabase/schema.sql` first.
 
 The solver, agents, and approval gate are local. Nothing is sent to the public.
 
-A flood desk for any city. Search Jakarta, Houston, Dhaka, or your own location. Live rain and a height-field solver produce one verdict: this road, this deep, in this many minutes.
+## Products and tools used
 
-## Run
+Hackathon required list. Only items we actually wired are marked **used**. The rest were available and not integrated.
 
-```bash
-cd neeru
-npm install
-npm test
-npm run dev
-```
+| Product | Used? | Where it sits in Neeru |
+|---|---|---|
+| **AI Tinkerers** | Event | Built for this hackathon |
+| **OpenRouter** | Yes | Help chat, trip warning copy, operator brief. Server proxy `/api/openrouter`; model `openai/gpt-4o-mini` |
+| **OpenAI** | Yes, through OpenRouter | Same Help/warning path. We do not call OpenAI’s API directly |
+| CopilotKit | No | Not in the repo |
+| Exa | No | Not in the repo |
+| Trigger.dev | No | Not in the repo |
+| Auth0 | No | Not in the repo |
+| Mozilla.ai | No | Not in the repo |
+| Ambiguous AI | No | Not in the repo |
 
-Open http://127.0.0.1:5173/
+### Also in the product (not on that list)
 
-## Optional keys
+| Tool | Why |
+|---|---|
+| Open-Meteo | Geocoding, elevation DEM sample, live rain, temperature, humidity, 24h/48h forecast |
+| OpenStreetMap + Leaflet | Real map tiles |
+| Nominatim | Reverse-geocode “you are near X” |
+| OSM Overpass | Tunnels and drains when the API answers in time |
+| OSRM | Driving route and distance, then skip flooded points |
+| Supabase | Optional call log (`call_log` table) |
+| Vite + React + TypeScript | App |
+| Vercel | Production host |
+| GitHub Pages | Backup host |
 
-Copy `.env.example` to `.env`.
+## What each live call does
 
-- `OPENROUTER_API_KEY` — two-sentence operator brief (also paste in Connect)
-- `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` — persist desks. Run `supabase/schema.sql` first.
-
-Without keys the desk still runs. Brief and save stay off.
-
-## What is live
-
-- OpenStreetMap tiles
-- Open-Meteo geocoding, elevation, forecast, archive
-- OSM Overpass tunnels/drains when the API answers
-
-The solver, agents, and approval gate are local. Nothing is sent to the public.
+| You see | Why | API / code |
+|---|---|---|
+| City search | Need a place to run the model | Open-Meteo geocoding |
+| Map | Real streets | OSM tiles via Leaflet |
+| Observed rain / temp / humidity | Is a storm happening now | Open-Meteo forecast |
+| Depth cm, draining / activated | 30 cm is a two-wheeler cutoff | Local height-field solver |
+| Local mm/hr on each point | Rain is heavier near the storm centre | Modelled falloff from peak |
+| Agents 8/8 | Specialists read one water graph | In-app, not a second API |
+| Go from A to B | Path that skips flooded ground | OSRM + our flood points |
+| Ask Neeru | What to do / where next | OpenRouter → OpenAI GPT-4o-mini, using only this map |
+| Call log | History of storms, trips, questions | This browser; Supabase if configured |
