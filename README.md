@@ -1,6 +1,6 @@
 # Neeru
 
-Live site (after Pages deploys): https://anshul-real.github.io/neeru-AI/
+Live site (after Pages deploys): https://neeru-sigma.vercel.app/
 
 A flood desk for any city. Search a place, run a storm, see which roads pond, ask where to go next.
 
