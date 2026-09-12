@@ -200,7 +200,7 @@ export async function fetchDrainPaths(bbox: BBox): Promise<[number, number][][]>
   }
 }
 
-function planeSample(bbox: BBox, n: number): number[] {
+function planeSample(_bbox: BBox, n: number): number[] {
   const out: number[] = [];
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
